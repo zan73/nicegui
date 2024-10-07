@@ -1,8 +1,7 @@
 FROM zauberzeug/nicegui
 LABEL org.opencontainers.image.authors="Zenon Skuza <zenon@skuza.net>"
-ARG PYTHON_MODULES
-ENV PYTHON_MODULES=${PYTHON_MODULES}
-RUN /bin/bash -c 'if [ -n "$PYTHON_MODULES" ]; then \
+ENV PYTHON_MODULES=""
+CMD /bin/bash -c 'if [ -n "$PYTHON_MODULES" ]; then \
         IFS="|" read -ra MODULES <<< "$PYTHON_MODULES"; \
         for module in "${MODULES[@]}"; do \
             echo "Installing $module"; \
@@ -10,4 +9,4 @@ RUN /bin/bash -c 'if [ -n "$PYTHON_MODULES" ]; then \
                 echo "ERROR: Failed to install $module" >&2; \
             fi; \
         done; \
-    fi'
+    fi' && exec "$@"
