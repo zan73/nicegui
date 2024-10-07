@@ -9,4 +9,4 @@ CMD /bin/bash -c 'if [ -n "$PYTHON_MODULES" ]; then \
                 echo "ERROR: Failed to install $module" >&2; \
             fi; \
         done; \
-    fi' && exec "$@"
+    fi' && exec python main.py
