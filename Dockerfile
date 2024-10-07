@@ -1,6 +1,7 @@
 FROM zauberzeug/nicegui
 LABEL org.opencontainers.image.authors="Zenon Skuza <zenon@skuza.net>"
-ENV PYTHON_MODULES
+ARG PYTHON_MODULES
+ENV PYTHON_MODULES=${PYTHON_MODULES}
 RUN /bin/bash -c 'if [ -n "$PYTHON_MODULES" ]; then \
         IFS="|" read -ra MODULES <<< "$PYTHON_MODULES"; \
         for module in "${MODULES[@]}"; do \
