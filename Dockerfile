@@ -1,12 +1,14 @@
 FROM zauberzeug/nicegui
 LABEL org.opencontainers.image.authors="Zenon Skuza <zenon@skuza.net>"
-ENV PYTHON_MODULES="requests"
-CMD /bin/bash -c 'if [ -n "$PYTHON_MODULES" ]; then \
-        IFS="|" read -ra MODULES <<< "$PYTHON_MODULES"; \
-        for module in "${MODULES[@]}"; do \
-            echo "Installing $module"; \
-            if ! pip install --no-cache-dir "$module"; then \
-                echo "ERROR: Failed to install $module" >&2; \
-            fi; \
-        done; \
-    fi' && exec python main.py
+# Set up the environment variable
+ENV REQUIREMENTS_FILE=""
+
+# Modify the entrypoint script to install Python modules from the requirements file
+RUN sed -i '/^#!/a\
+if [ -n "$REQUIREMENTS_FILE" ]; then \
+    echo "Installing Python modules from $REQUIREMENTS_FILE"; \
+    if ! pip install -r "$REQUIREMENTS_FILE"; then \
+        echo "ERROR: Failed to install Python modules from $REQUIREMENTS_FILE" >&2; \
+        exit 1; \
+    fi; \
+fi' /resources/docker-entrypoint.sh
