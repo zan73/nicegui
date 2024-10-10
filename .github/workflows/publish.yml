@@ -1,0 +1,55 @@
+name: Publish Release
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare
+        id: prep
+        run: |
+          DOCKER_IMAGE=${{ secrets.DOCKER_USERNAME }}/${GITHUB_REPOSITORY#*/}
+          VERSION=latest
+          # Set output parameters.
+          echo ::set-output name=version::${VERSION}
+          echo ::set-output name=docker_image::${DOCKER_IMAGE}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@master
+        with:
+          platforms: all
+      - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@master
+        with:
+          install: true
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.prep.outputs.tags }}
+          build-args: VERSION=${{ steps.prep.outputs.version }}
+
+      # Uploading the README.md is not a core feature of docker/build-push-action yet
+      - name: Update README
+        uses: christian-korneck/update-container-description-action@v1
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
+        with:
+          destination_container_repo: zauberzeug/nicegui
+          provider: dockerhub
+          short_description: "Extends nicegui docker to install python modules based on environment variable"
