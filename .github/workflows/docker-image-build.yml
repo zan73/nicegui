@@ -32,8 +32,17 @@ jobs:
             echo "::set-output name=update_needed::false"
           fi
 
+          docker build . -t zans/nicegui:latest
+          docker push zans/nicegui:latest
+
       - name: Build and Push Docker Image
         if: steps.check_image.outputs.update_needed == 'true'
         run: |
-          docker build . -t zans/nicegui:latest
-          docker push zans/nicegui:latest
+          # Create a new builder instance for multi-architecture
+          docker buildx create --use
+
+          # Build and push for both amd64 and arm64 architectures
+          docker buildx build --platform linux/amd64,linux/arm64 --push -t zans/nicegui:latest .
+
+          # Remove builder instance
+          docker buildx rm
