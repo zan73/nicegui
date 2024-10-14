@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   schedule:
-    - cron: "*/5 * * * *"  # Every midnight and noon (adjust this as necessary)
+  #  - cron: "*/5 * * * *"  # Every midnight and noon (adjust this as necessary)
   workflow_dispatch: # Allows manual triggers as well
 
 jobs:
@@ -12,36 +12,38 @@ jobs:
       - name: Check Out Repository
         uses: actions/checkout@v4
 
-      - name: Set Up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Log In to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Check for Upstream Image Update
-        id: check_image
-        run: |
-          docker pull zauberzeug/nicegui:latest
+      #- name: Check for Upstream Image Update
+      #  id: check_image
+      #  run: |
+      #    docker pull zauberzeug/nicegui:latest
           
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' zauberzeug/nicegui:latest)
-          if [ "$DIGEST" != "$(cat .last_digest 2>/dev/null)" ]; then
-            echo "::set-output name=update_needed::true"
-            echo $DIGEST > .last_digest
-          else
-            echo "::set-output name=update_needed::false"
-          fi
+      #    DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' zauberzeug/nicegui:latest)
+      #    if [ "$DIGEST" != "$(cat .last_digest 2>/dev/null)" ]; then
+      #      echo "::set-output name=update_needed::true"
+      #      echo $DIGEST > .last_digest
+      #    else
+      #      echo "::set-output name=update_needed::false"
+      #    fi
 
-      - name: Build and Push Docker Image
-        if: steps.check_image.outputs.update_needed == 'true'
-        run: |
-          # Create a new builder instance for multi-architecture
-          docker buildx create --use
+      - name: Set up Docker Buildx
+        #if: steps.check_image.outputs.update_needed == 'true'
+        id: buildx
+        uses: docker/setup-buildx-action@master
+        with:
+          install: true
 
-          # Build and push for both amd64 and arm64 architectures
-          docker buildx build --platform linux/amd64,linux/arm64 --push -t zans/nicegui:latest .
-
-          # Remove builder instance
-          docker buildx rm
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.prep.outputs.tags }}
+          build-args: VERSION=${{ steps.prep.outputs.version }}
