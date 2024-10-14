@@ -45,5 +45,5 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.prep.outputs.tags }}
-          build-args: VERSION=${{ steps.prep.outputs.version }}
+          tags: latest
+          #build-args: VERSION=${{ steps.prep.outputs.version }}
