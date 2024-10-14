@@ -13,7 +13,7 @@ jobs:
       - name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/${GITHUB_REPOSITORY#*/}
+          DOCKER_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/nicegui
           VERSION=latest
           # Set output parameters.
           echo ::set-output name=version::${VERSION}
