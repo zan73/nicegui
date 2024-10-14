@@ -40,7 +40,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.prep.outputs.tags }}
+          tags: ${{ steps.prep.outputs.version }}
           build-args: VERSION=${{ steps.prep.outputs.version }}
 
       # Uploading the README.md is not a core feature of docker/build-push-action yet
