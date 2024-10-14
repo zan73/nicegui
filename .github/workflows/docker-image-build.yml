@@ -24,6 +24,8 @@ jobs:
       - name: Check for Upstream Image Update
         id: check_image
         run: |
+          docker pull zauberzeug/nicegui:latest
+          
           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' zauberzeug/nicegui:latest)
           if [ "$DIGEST" != "$(cat .last_digest 2>/dev/null)" ]; then
             echo "::set-output name=update_needed::true"
@@ -31,9 +33,6 @@ jobs:
           else
             echo "::set-output name=update_needed::false"
           fi
-
-          docker build . -t zans/nicegui:latest
-          docker push zans/nicegui:latest
 
       - name: Build and Push Docker Image
         if: steps.check_image.outputs.update_needed == 'true'
