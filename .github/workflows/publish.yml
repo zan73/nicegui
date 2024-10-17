@@ -40,16 +40,4 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.prep.outputs.version }}
-          build-args: VERSION=${{ steps.prep.outputs.version }}
-
-      # Uploading the README.md is not a core feature of docker/build-push-action yet
-      - name: Update README
-        uses: christian-korneck/update-container-description-action@v1
-        env:
-          DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
-        with:
-          destination_container_repo: zauberzeug/nicegui
-          provider: dockerhub
-          short_description: "Extends nicegui docker to install python modules based on environment variable"
+          tags: ${{ steps.prep.outputs.docker_image }}:${{ steps.prep.outputs.version }}
