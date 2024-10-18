@@ -13,7 +13,7 @@ jobs:
       - name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/nicegui
+          DOCKER_IMAGE=zans/nicegui
           VERSION=latest
           # Set output parameters.
           echo ::set-output name=version::${VERSION}
