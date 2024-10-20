@@ -1,4 +1,4 @@
-FROM zauberzeug/nicegui
+FROM zauberzeug/nicegui:latest
 LABEL org.opencontainers.image.authors="Zenon Skuza <zenon@skuza.net>"
 # Set up the environment variable
 ENV REQUIREMENTS_FILE=""
