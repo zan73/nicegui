@@ -3,6 +3,11 @@ name: Publish Release
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   docker:
@@ -39,5 +44,5 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
-          push: true
+          push: ${{ github.event_name != 'pull_request' }} #only publish a new image if it is merged onto main
           tags: ${{ steps.prep.outputs.docker_image }}:${{ steps.prep.outputs.version }}
